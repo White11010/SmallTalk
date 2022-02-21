@@ -7,7 +7,7 @@ const pool = new Pool({
     database: "chat_postgres"
 })
 if (pool){
-    console.log('Успешно')
+    console.log('Postgres - Ok')
 }else {
     console.log('Ошибка')
 }
