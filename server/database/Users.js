@@ -13,7 +13,13 @@ const getUser = async function (login) {
     return user
 }
 
+const getUserSearch = async function(login){
+    const users = await db.query(`select id,login from users where lower(login) like $1`, [login.toLowerCase()+'%'])
+    return users
+}
+
 module.exports = {
     newUser,
-    getUser
+    getUser,
+    getUserSearch
 }
