@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const authRouter = require('./routes/authRoutes')
 const conversationRoutes = require('./routes/conversationRoutes')
 const messagesRoutes = require('./routes/messagesRoutes')
+const usersController = require('./routes/usersRoutes')
 
 const PORT = process.env.PORT || 3333;
 const app = express()
@@ -16,6 +17,7 @@ app.use(cors())
 app.use('/auth', authRouter)
 app.use('/chat', conversationRoutes)
 app.use('/chat', messagesRoutes)
+app.use('/users', usersController)
 
 const start = async () => {
     try {
