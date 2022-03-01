@@ -21,7 +21,7 @@ app.use('/users', usersController)
 
 const start = async () => {
     try {
-        await mongoose.connect(`mongodb+srv://ValentinKavrin:dashadom74@cluster0.qtwef.mongodb.net/chat_mongo?retryWrites=true&w=majority`)
+        await mongoose.connect(`mongodb+srv://ValentinKavrin:@cluster0.qtwef.mongodb.net/chat_mongo?retryWrites=true&w=majority`)
         .then(() => {
             console.log('Mongo - Ok');
         })
