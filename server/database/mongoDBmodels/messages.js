@@ -2,11 +2,11 @@ const mongoose = require('mongoose')
 
 const messagesSchema = new mongoose.Schema(
     {
-        conversationId: {
-            type: String,
+        receiver: {
+            type: Number,
         },
         sender: {
-            type: String,
+            type: Number,
         },
         text: {
             type: String,

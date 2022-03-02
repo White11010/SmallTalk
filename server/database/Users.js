@@ -18,8 +18,13 @@ const getUserSearch = async function(login){
     return users
 }
 
+const getUsersById = async function (idOne, idTwo) {
+    const users = await db.query(`select id, login from users where id=$1 or id=$2`, [idOne, idTwo])
+    return users
+}
 module.exports = {
     newUser,
     getUser,
-    getUserSearch
+    getUserSearch,
+    getUsersById
 }
