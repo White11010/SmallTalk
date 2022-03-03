@@ -1,12 +1,17 @@
 <template>
   <q-list class="q-pa-md" separator>
+    <q-item v-if="chatsList.length === 0">
+      <q-item-section avatar>
+        <p class="text-body1 text-grey-7">No chats. Find a user by his login to start messaging</p>
+      </q-item-section>
+    </q-item>
     <q-item
       v-for="chat in chatsList"
-      :key="chat.userId"
+      :key="chat.id"
       clickable
       v-ripple
-      :active="active === chat.userId"
-      @click="handleActiveChat(chat.userId)"
+      :active="active !== null && active.secondUserId === chat.id"
+      @click="handleActiveChat(chat.id)"
       active-class="chat-list__item--active"
       class="text-blue-grey-8"
     >
@@ -14,14 +19,14 @@
         <q-icon v-if="chat.avatar === undefined" name="person_outline"/>
       </q-item-section>
       <q-item-section>
-        {{ chat.userId }}
+        {{ chat.login }}
       </q-item-section>
     </q-item>
   </q-list>
 </template>
 
 <script>
-import {defineComponent, ref} from "vue";
+import {computed, defineComponent, ref} from "vue";
 import {useStore} from "vuex";
 
 
@@ -31,18 +36,17 @@ export default defineComponent({
 
   setup(props) {
 
-    const active = ref(null)
     const store = useStore();
 
+    const active = computed(() => store.getters["chats/activeChat"])
+
     const handleActiveChat = (chatId) => {
-      active.value = chatId;
-      console.log(props.userId, chatId)
-      store.dispatch("chats/setActiveChat", {firstUserId: props.userId, secondUserId: chatId})
+      store.dispatch("chats/setActiveChat", {firstUserId: props.userId, secondUserId: chatId, messages: null})
     }
 
     return {
-      active,
-      handleActiveChat
+      handleActiveChat,
+      active
     }
   }
 })

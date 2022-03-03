@@ -41,8 +41,9 @@ import {useRouter} from "vue-router";
 
 export default defineComponent({
   name: "StartHeader",
+  props: ["socket"],
 
-  setup () {
+  setup (props) {
     const $q = useQuasar()
     const store = useStore();
     const router = useRouter();
@@ -54,6 +55,7 @@ export default defineComponent({
       onItemClick() {
         store.dispatch("auth/logout").then(
           () => {
+            props.socket.disconnect()
             router.push("/");
           },
           () => {

@@ -4,32 +4,39 @@
       <p class="text-white no-margin">Select a chat to start messaging</p>
     </div>
     <div v-else class="q-pa-md column justify-end" style="width: 100%; height: 100%">
-      <div class="q-pa-md row justify-center">
-        <div style="width: 100%">
-          <q-chat-message
-            v-for="message in messages"
-            :key="message.text"
-            :name="message.recieverId == userId ? 'me' : message.recieverId"
-            :text="[message.text]"
-            :sent="message.recieverId == userId"
-          />
-        </div>
+      <div class="q-pa-md" style="flex: 1">
+          <div class="column justify-end active-chat__messages">
+            <q-chat-message
+              v-for="message in messages"
+              :key="message.text"
+              :name="message.senderId == userId ? 'me' : message.recieverId"
+              :text="[message.text]"
+              :sent="message.senderId == userId"
+              class="text-h6"
+            />
+          </div>
       </div>
-      <q-form @submit="onSubmit">
+      <q-form class="row items-end active-chat__form" @submit="onSubmit">
         <q-input
           v-model="text"
           filled
           type="textarea"
+          aria-multiline="true"
+          placeholder="Write a message..."
+          class="text-body1 active-chat__input"
         />
-        <q-btn class="q-ml-auto" type="submit" label="send" color="primary" icon-right="send" style="width: fit-content"/>
+        <q-btn class="q-ml-auto" type="submit" label="send" color="primary" icon-right="send"
+               style="width: fit-content; height: min-content"/>
       </q-form>
     </div>
   </div>
 </template>
 
 <script>
-import {defineComponent, computed, ref} from "vue";
+import {defineComponent, computed, ref, watch} from "vue";
 import {useStore} from "vuex";
+
+import MessagesService from "src/services/messages.service";
 
 export default defineComponent({
   name: "MessagesActiveChat",
@@ -37,21 +44,37 @@ export default defineComponent({
   setup(props) {
 
     const store = useStore();
+
     const activeChat = computed(() => store.getters['chats/activeChat'])
+    const messages = computed(() => store.getters['chats/activeMessages'])
 
     const text = ref(null)
 
-    const messages = ref([]);
 
-    props.socket.on("getMessage", (message) => {
-      console.log(message)
-      messages.value.push(message);
-    })
 
     const onSubmit = (event) => {
       event.preventDefault();
-      props.socket.emit("sendMessage", {senderId: props.userId, receiverId: activeChat.value.secondUserId, text: text.value})
+      MessagesService.send(activeChat.value.secondUserId, text.value).then(
+        message => {
+          console.log(message)
+          store.dispatch("chats/addNewMessage", {senderId: message.sender, receiverId: message.receiver, text: message.text, date: message.date})
+        },
+        error => {
+          console.log(error)
+        }
+      )
+      props.socket.emit("sendMessage", {
+        senderId: props.userId,
+        receiverId: activeChat.value.secondUserId,
+        text: text.value
+      })
+      text.value = null;
     }
+
+    watch(() => activeChat.value, () => {
+      activeChat.value !== null && store.dispatch("chats/getMessagesInActiveChat", activeChat.value.secondUserId)
+    })
+
 
     return {
       activeChat,
@@ -78,6 +101,26 @@ export default defineComponent({
     padding: 1rem;
     border-radius: 10px;
     background-color: $grey-6;
+  }
+
+  &__messages {
+    width: 100%;
+    height: 100%;
+    max-height: calc(100vh - 230px);
+    box-sizing: border-box;
+    padding-right: 10px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+  }
+
+  &__form {
+    height: fit-content !important;
+    gap: 1rem;
+  }
+
+  &__input {
+    flex: 1;
+    height: min-content !important;
   }
 }
 </style>

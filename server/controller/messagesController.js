@@ -26,7 +26,7 @@ class convController{
                 sender: savedMessage.sender,
                 receiver: savedMessage.receiver,
                 text: savedMessage.text,
-                data: savedMessage.createdAt
+                date: savedMessage.createdAt
             }
 
             res.status(200).json(chats)

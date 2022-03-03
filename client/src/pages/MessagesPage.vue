@@ -1,14 +1,14 @@
 <template>
   <q-page padding>
-    <the-header />
+    <the-header :socket="socket"/>
     <div class="wrapper" style="flex-direction: column">
       <div class="messages__page">
         <div class="messages__sidebar">
-          <messages-search />
-          <messages-chats-list :chatsList="chatsList" :userId="userData.id"/>
+          <messages-search :userId="userData && userData.id"/>
+          <messages-chats-list :chatsList="chatsList" :userId="userData && userData.id"/>
         </div>
         <div class="messages__main">
-          <messages-active-chat :userId="userData.id" :socket="socket"/>
+          <messages-active-chat :userId="userData && userData.id" :socket="socket"/>
         </div>
       </div>
     </div>
@@ -22,12 +22,13 @@ import MessagesChatsList from "components/MessagesChatsList";
 import MessagesActiveChat from "components/MessagesActiveChat";
 import {defineComponent} from "vue";
 import { io } from "socket.io-client";
-import {computed} from "vue";
+import {computed, onMounted} from "vue";
 import {useStore} from "vuex";
+import {activeChat} from "src/store/chats/getters";
 
 
 export default defineComponent({
-  name: 'RegistrationPage',
+  name: 'MessagesPage',
   components: {
     TheHeader,
     MessagesSearch,
@@ -41,13 +42,23 @@ export default defineComponent({
     const store = useStore();
 
     const userData = computed(() => store.getters['auth/userData'])
-    const chatsList = computed(() => store.getters['chats/chatsList'])
+    const chatsList = computed(() => store.getters['chats/chatsList'].filter(chat => userData.value && (chat.userId !== userData.value.id)))
+    const activeChat = computed(() => store.getters['chats/activeChat'])
 
     socket.emit("addUser", userData.value.id)
 
     socket.on("getUsers", (usersArray) => {
-      console.log(usersArray)
       store.dispatch("chats/saveChats", usersArray)
+    })
+
+    socket.on("getMessage", (message) => {
+      if (message.senderId === activeChat.value.secondUserId) {
+        store.dispatch("chats/addNewMessage", {senderId: message.senderId, receiverId: userData.value.id, text: message.text, date: new Date().toISOString()})
+      }
+    })
+
+    onMounted(() => {
+      store.dispatch("chats/saveChats")
     })
 
     return {
