@@ -21,8 +21,13 @@ class convController{
                 secondUserId: users.rows[1].id,
                 secondUserLogin: users.rows[1].login
             })
-            const savedConversation = await newConversation.save()
-            res.status(201).json(savedConversation)
+            const saveConv = await newConversation.save()
+
+            const response = saveConv.firstUserId === senderId ?
+            {id: saveConv.secondUserId, login: saveConv.secondUserLogin} : 
+            {id: saveConv.firstUserId, login: saveConv.firstUserLogin}
+            
+            res.status(201).json(response)
         } catch (error) {
             return res.status(500).json(error)
         }
