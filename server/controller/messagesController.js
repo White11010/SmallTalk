@@ -20,7 +20,6 @@ class convController{
                 text: text
             })
             const savedMessage = await newMessage.save()
-            console.log(savedMessage);
 
             const chats = {
                 sender: savedMessage.sender,
