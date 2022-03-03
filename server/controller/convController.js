@@ -10,24 +10,36 @@ class convController{
             if (!token) {
                 return res.status(401).json( {message: 'Необходимо авторизоваться'} )
             } 
+
         const { id: senderId } = jwt.verify(token, secret)
         const { receiverId } = req.body 
-        
         try {
             const users = await dbAuth.getUsersById(senderId, receiverId)
-            const newConversation = new Conversation({
-                firstUserId: users.rows[0].id,
-                firstUserLogin: users.rows[0].login,
-                secondUserId: users.rows[1].id,
-                secondUserLogin: users.rows[1].login
-            })
-            const saveConv = await newConversation.save()
 
-            const response = saveConv.firstUserId === senderId ?
-            {id: saveConv.secondUserId, login: saveConv.secondUserLogin} : 
-            {id: saveConv.firstUserId, login: saveConv.firstUserLogin}
-            
-            res.status(201).json(response)
+            const conversation = await Conversation.findOne({
+                $and: [
+                {$or: [ {firstUserId: senderId}, {secondUserId: senderId} ] },
+                {$or: [ {firstUserId: receiverId}, {secondUserId: receiverId} ] }
+                ]
+            })
+
+            if (conversation === null ) {
+                const newConversation = new Conversation({
+                    firstUserId: users.rows[0].id,
+                    firstUserLogin: users.rows[0].login,
+                    secondUserId: users.rows[1].id,
+                    secondUserLogin: users.rows[1].login
+                })
+                const saveConv = await newConversation.save()
+    
+                const response = saveConv.firstUserId === senderId ?
+                {id: saveConv.secondUserId, login: saveConv.secondUserLogin} : 
+                {id: saveConv.firstUserId, login: saveConv.firstUserLogin}
+                
+                res.status(201).json(response)
+            } else {
+                res.status(409)
+            }
         } catch (error) {
             return res.status(500).json(error)
         }
