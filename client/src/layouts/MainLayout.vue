@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh lpR fFf" style="background-color: #F7F8FA;">
+  <q-layout view="hHh lpR fFf" style="background-color: #F7F8FA; max-height: 100vh">
     <q-page-container>
       <router-view />
     </q-page-container>

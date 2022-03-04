@@ -76,8 +76,15 @@ export default defineComponent({
     const handleLogin = (event) => {
       event.preventDefault()
       store.dispatch("auth/login", toRaw(userData)).then(
-        () => {
+        (user) => {
           router.push("/messages");
+          $q.notify({
+            color: 'green-4',
+            textColor: 'white',
+            position: 'top',
+            icon: 'cloud_done',
+            message: `Welcome, ${user.login}`
+          })
         },
         () => {
           $q.notify({

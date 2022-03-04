@@ -4,14 +4,14 @@
       <p class="text-white no-margin">Select a chat to start messaging</p>
     </div>
     <div v-else class="q-pa-md column justify-end" style="width: 100%; height: 100%">
-      <div class="q-pa-md" style="flex: 1">
-          <div class="column justify-end active-chat__messages">
+      <div class="q-pa-md" style="height: calc(100% - 135px)">
+          <div class="active-chat__messages" ref="messagesArea">
             <q-chat-message
-              v-for="message in messages"
-              :key="message.text"
-              :name="message.senderId == userId ? 'me' : message.recieverId"
+              v-for="(message, index) in messages"
+              :key="index"
+              :name="message.sender === userId ? 'me' : message.sender.toString()"
               :text="[message.text]"
-              :sent="message.senderId == userId"
+              :sent="message.sender === userId"
               class="text-h6"
             />
           </div>
@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import {defineComponent, computed, ref, watch} from "vue";
+import {defineComponent, computed, ref, watch, onMounted, watchEffect} from "vue";
 import {useStore} from "vuex";
 
 import MessagesService from "src/services/messages.service";
@@ -45,19 +45,32 @@ export default defineComponent({
 
     const store = useStore();
 
+    const messagesArea = ref(null);
+
     const activeChat = computed(() => store.getters['chats/activeChat'])
     const messages = computed(() => store.getters['chats/activeMessages'])
 
     const text = ref(null)
 
 
+    watch(() => activeChat.value, () => {
+      activeChat.value !== null && store.dispatch("chats/getMessagesInActiveChat", activeChat.value.secondUserId)
+    })
+
+    watchEffect(() =>  {
+      if (messages.value.length !== 0) {
+        setTimeout(() => {
+          messagesArea.value.scrollTop = messagesArea.value.scrollHeight - messagesArea.value.clientHeight
+        })
+      }
+    })
+
 
     const onSubmit = (event) => {
       event.preventDefault();
       MessagesService.send(activeChat.value.secondUserId, text.value).then(
         message => {
-          console.log(message)
-          store.dispatch("chats/addNewMessage", {senderId: message.sender, receiverId: message.receiver, text: message.text, date: message.date})
+          store.dispatch("chats/addNewMessage", {sender: message.sender, text: message.text, date: message.date})
         },
         error => {
           console.log(error)
@@ -71,20 +84,14 @@ export default defineComponent({
       text.value = null;
     }
 
-    watch(() => activeChat.value, () => {
-      activeChat.value !== null && store.dispatch("chats/getMessagesInActiveChat", activeChat.value.secondUserId)
-    })
-
-
     return {
       activeChat,
       text,
       messages,
-      onSubmit
+      onSubmit,
+      messagesArea
     }
   }
-
-
 })
 </script>
 
@@ -106,10 +113,8 @@ export default defineComponent({
   &__messages {
     width: 100%;
     height: 100%;
-    max-height: calc(100vh - 230px);
     box-sizing: border-box;
     padding-right: 10px;
-    overflow-x: hidden;
     overflow-y: scroll;
   }
 

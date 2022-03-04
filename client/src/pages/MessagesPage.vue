@@ -1,8 +1,8 @@
 <template>
-  <q-page padding>
+  <q-page padding >
     <the-header :socket="socket"/>
     <div class="wrapper" style="flex-direction: column">
-      <div class="messages__page">
+      <div class="messages__page" style="height: calc(100vh - 98px);">
         <div class="messages__sidebar">
           <messages-search :userId="userData && userData.id"/>
           <messages-chats-list :chatsList="chatsList" :userId="userData && userData.id"/>
@@ -52,8 +52,10 @@ export default defineComponent({
     })
 
     socket.on("getMessage", (message) => {
+      console.log(message)
+      console.log( activeChat.value.secondUserId)
       if (message.senderId === activeChat.value.secondUserId) {
-        store.dispatch("chats/addNewMessage", {senderId: message.senderId, receiverId: userData.value.id, text: message.text, date: new Date().toISOString()})
+        store.dispatch("chats/addNewMessage", {sender: message.senderId, text: message.text, date: new Date().toISOString()})
       }
     })
 
@@ -78,9 +80,11 @@ export default defineComponent({
   width: 100%;
   display: grid;
   grid-template-columns: 300px 1fr;
+  grid-template-rows: 100%;
 }
 .messages__sidebar {
-  height: 100%;
+  min-height: 0;
+  max-height: 100%;
   border-right: 1px solid #eeeeee;
 }
 
