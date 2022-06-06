@@ -1,0 +1,6 @@
+@import "./variables";
+
+.modal {
+  width: min(450px, 100vw) !important;
+  padding: $padding * 2 !important;
+}
