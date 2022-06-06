@@ -7,5 +7,10 @@ export const userStore = {
     setLogin(state, data) {
       state.login = data;
     }
+  },
+  getters: {
+    getLogin(state) {
+      return state.login;
+    }
   }
 }

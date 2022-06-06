@@ -1,13 +1,15 @@
 <template>
-<h1>Messages</h1>
+  <section class="messages">
+    <main-sidebar></main-sidebar>
+  </section>
 </template>
 
-<script>
-export default {
-  name: "MessagesView"
-}
+<script setup>
+import MainSidebar from "@/layouts/MainSidebar/MainSidebar"
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+.section {
+  background-color: #F5F5F5;
+}
 </style>

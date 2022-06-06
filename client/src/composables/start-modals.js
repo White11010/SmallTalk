@@ -20,11 +20,11 @@ export function useStartModals() {
     } else {
       throw new Error('Unexpected modal component');
     }
+  }
 
-    return {
-      currentModal,
-      setCurrentModal,
-      isModalShown
-    }
+  return {
+    currentModal,
+    setCurrentModal,
+    isModalShown
   }
 }
