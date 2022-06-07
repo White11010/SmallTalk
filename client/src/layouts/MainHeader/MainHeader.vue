@@ -4,8 +4,8 @@
     <v-toolbar-title>Small Talk</v-toolbar-title>
     <v-spacer></v-spacer>
     <div v-if="userLogin.trim().length === 0">
-      <v-btn @click="setCurrentModal(SignInModal)">Sign in</v-btn>
-      <v-btn @click="setCurrentModal(SignUpModal)">Sign Up</v-btn>
+      <v-btn @click.stop="setCurrentModal(SignInModal)">Sign in</v-btn>
+      <v-btn @click.stop="setCurrentModal(SignUpModal)">Sign Up</v-btn>
       <form-modal
           v-if="currentModal"
           :current-modal="currentModal"
