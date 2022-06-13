@@ -1,0 +1,22 @@
+{
+  "empty": {
+    "code": 400,
+    "message": "Login or password cannot be empty"
+  },
+  "login": {
+    "invalid": {
+      "code": 400,
+      "message": "Invalid login"
+    },
+    "duplicated": {
+      "code": 409,
+      "message": "User with this login already exist"
+    }
+  },
+  "password": {
+    "invalid": {
+      "code": 400,
+      "message": "Invalid password"
+    }
+  }
+}
